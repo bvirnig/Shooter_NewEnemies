@@ -1,0 +1,72 @@
+[gd_scene load_steps=5 format=3 uid="uid://br6iyvbnjtf68"]
+
+[ext_resource type="Script" path="res://spawn_enemy.gd" id="1_aybl3"]
+
+[sub_resource type="CanvasTexture" id="CanvasTexture_q43td"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hlop2"]
+size = Vector2(40, 40)
+
+[sub_resource type="GDScript" id="GDScript_ja7p6"]
+script/source = "extends State
+class_name SpawnState
+
+@export var spawn_timer: float = 2.0  # Time in seconds between spawns
+var spawn_timer_counter: float = 0.0  # Timer counter
+var enemy_scene: PackedScene  # Preload your enemy scene (the enemy to be spawned)
+var spawn_marker: Marker2D  # Reference to the Marker2D for spawn position
+
+func initialize():
+	spawn_timer_counter = spawn_timer  # Initialize the spawn timer
+	
+	# Preload the enemy scene
+	enemy_scene = preload(\"res://actors/enemies/tracker_enemies.tscn\")
+	if enemy_scene == null:
+		print(\"Error: Failed to load enemy scene. Check the path.\")
+	else:
+		print(\"Enemy scene loaded successfully.\")
+
+	# Find the Marker2D in the current scene
+	spawn_marker = body.get_node(\"Marker2D\")  # Replace \"SpawnPoint\" with the name of your Marker2D
+	if spawn_marker == null:
+		print(\"Error: SpawnPoint not found.\")
+	else:
+		print(\"SpawnPoint found at: \", spawn_marker.position)
+
+func process_state(delta: float):
+	spawn_timer_counter -= delta  # Reduce the spawn timer
+
+	if spawn_timer_counter <= 0:
+		spawn_enemy()  # Call the function to spawn a new enemy
+		spawn_timer_counter = spawn_timer  # Reset the spawn timer
+
+func spawn_enemy():
+	if enemy_scene:  # Check if enemy_scene is valid
+		var new_enemy = enemy_scene.instantiate()  # Create a new enemy instance
+		# Set the position to the spawn marker's position
+		new_enemy.position = spawn_marker.position  
+		get_parent().add_child(new_enemy)  # Add the new enemy to the same parent node as the current enemy
+		print(\"Spawned new enemy at: \", new_enemy.position)  # Debug output
+	else:
+		print(\"Error: Cannot spawn enemy because enemy_scene is null.\")
+"
+
+[node name="spawn_enemy" type="CharacterBody2D" node_paths=PackedStringArray("initial_state")]
+script = ExtResource("1_aybl3")
+initial_state = NodePath("States/SpawnState")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+modulate = Color(1, 0.317647, 1, 1)
+scale = Vector2(40, 40)
+texture = SubResource("CanvasTexture_q43td")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_hlop2")
+
+[node name="States" type="Node" parent="."]
+
+[node name="SpawnState" type="Node" parent="States"]
+script = SubResource("GDScript_ja7p6")
+
+[node name="Marker2D" type="Marker2D" parent="."]
+position = Vector2(0, 20)

@@ -1,0 +1,150 @@
+[gd_scene load_steps=11 format=3 uid="uid://cgohrpdl8gik6"]
+
+[ext_resource type="Script" path="res://actors/enemies/SpawnerEnemy/spawner_enemy.gd" id="1_022ou"]
+[ext_resource type="Script" path="res://actors/enemies/spawning.gd" id="2_ykrqv"]
+[ext_resource type="PackedScene" uid="uid://c0uc25h4u0wbw" path="res://actors/enemies/basic_enemy.tscn" id="3_hmp60"]
+[ext_resource type="Texture2D" uid="uid://cdifduibu4pqa" path="res://actors/enemies/Mobs/Coffin/Coffin Front Sheet.png" id="4_aop5q"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_oes2w"]
+size = Vector2(97, 135)
+
+[sub_resource type="CanvasTexture" id="CanvasTexture_q6ugr"]
+
+[sub_resource type="Animation" id="Animation_ag3rp"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:hframes")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [18]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".:vframes")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [4]
+}
+
+[sub_resource type="Animation" id="Animation_ncnw0"]
+resource_name = "coffin_front_idle"
+length = 0.18
+loop_mode = 1
+step = 0.125
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.0333333, 0.0666667, 0.1, 0.133333, 0.166667, 0.2),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3, 4, 5, 6]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:hframes")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [18]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".:vframes")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [4]
+}
+
+[sub_resource type="Animation" id="Animation_hk8ka"]
+resource_name = "coffin_summon"
+length = 1.05
+loop_mode = 1
+step = 0.125
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [36, 37, 38, 39, 40, 41, 42, 43, 53]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_1bcyi"]
+_data = {
+"RESET": SubResource("Animation_ag3rp"),
+"coffin_front_idle": SubResource("Animation_ncnw0"),
+"coffin_summon": SubResource("Animation_hk8ka")
+}
+
+[node name="SpawnerEnemy" type="CharacterBody2D" node_paths=PackedStringArray("initial_state")]
+collision_layer = 2
+collision_mask = 3
+script = ExtResource("1_022ou")
+initial_state = NodePath("States/SpawnEnemies")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-33.5, 3.5)
+shape = SubResource("RectangleShape2D_oes2w")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(20, 20)
+texture = SubResource("CanvasTexture_q6ugr")
+
+[node name="States" type="Node" parent="."]
+
+[node name="SpawnEnemies" type="Node" parent="States"]
+script = ExtResource("2_ykrqv")
+enemy_scene = ExtResource("3_hmp60")
+
+[node name="CharacterSprite" type="Sprite2D" parent="."]
+scale = Vector2(4, 4)
+texture = ExtResource("4_aop5q")
+hframes = 18
+vframes = 4
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+root_node = NodePath("../CharacterSprite")
+libraries = {
+"": SubResource("AnimationLibrary_1bcyi")
+}
+speed_scale = 0.614
